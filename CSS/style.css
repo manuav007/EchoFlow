@@ -1,0 +1,277 @@
+/*
+ * LetsChat - Updated Design with wallpapers for Main Chat AND User Panel
+ */
+
+/* ==========================================================================
+   1. Base & Utilities
+   ========================================================================== */
+
+:root {
+    --primary-color: #5b5b5b; 
+    --accent-color: #007bff; 
+    --chat-bubble-self: #dcf8c6; 
+    --chat-bubble-other: #ffffff; 
+    --border-radius-base: 15px;
+    --border-radius-pill: 25px;
+    --shadow-base: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+    /* New: Define a subtle light background for text readability on wallpapers */
+    --wallpaper-overlay-light: rgba(255, 255, 255, 0.2); 
+    --wallpaper-overlay-dark: rgba(0, 0, 0, 0.3);
+}
+
+/* Import modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Sansita+Swashed:wght@700&display=swap');
+
+body {
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #0d4a16, #2bba51);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* After the H1 definition in Section 1, add/replace the following: */
+
+/* New: Style the nav container to stack and center its contents */
+nav {
+    display: flex;
+    flex-direction: column; /* Stacks items vertically: logo on top, then H1 */
+    align-items: center;    /* Centers all children (logo and H1) horizontally */
+    margin-bottom: 20px;    /* Adds space below the navigation area */
+}
+
+/* Adjust the logo size and positioning */
+.logo {
+    /* Kept your original width */
+    width: 80px; 
+    /* Remove previous block/margin auto for Flexbox to handle alignment */
+    /* display: block; */
+    /* margin: auto; */
+    margin-bottom: 5px; /* Add small space between logo and H1 */
+}
+
+/* Style the main title */
+h1 {
+    font-family: 'Sansita Swashed', cursive;
+    text-align: center; 
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    margin: 0; /* Remove top/bottom margin for cleaner vertical spacing */
+}
+
+/* Scrollbar styles (omitted for brevity) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #6f7070; }
+
+
+/* ==========================================================================
+   2. Main Layout (Main Chat Area Wallpaper)
+   ========================================================================== */
+
+
+
+
+.main-chat {
+    display: flex;
+    height: 95vh;
+    width: 95%;
+    max-width: 1400px;
+    border-radius: var(--border-radius-base);
+    overflow: hidden;
+    box-shadow: var(--shadow-base);
+
+    /* --- Base Wallpaper Settings for Main Chat --- */
+    background-image: url('../images/bg1.jpg'); /* Default Main Chat Wallpaper */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--wallpaper-overlay-dark); /* Subtle dark overlay for main chat */
+    background-blend-mode: multiply; /* Blends overlay with image */
+    transition: background-image 0.5s ease;
+}
+
+
+/* ==========================================================================
+   3. User Panel (Left Sidebar Wallpaper)
+   ========================================================================== */
+
+.user-panel {
+    width: 280px; 
+    min-width: 250px;
+    /* --- Base Wallpaper Settings for User Panel --- */
+    background-image: url('../images/wallpaper-green.png'); /* Default User Panel Wallpaper */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--wallpaper-overlay-light); /* Subtle light overlay for user panel */
+    background-blend-mode: multiply; /* Blends overlay with image */
+    transition: background-image 0.5s ease;
+
+    padding: 20px 15px;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-panel h2 {
+    font-size: 1.1rem;
+    color: #6d1010; /* Changed to white for better contrast on wallpaper */
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 4px solid rgba(255, 255, 255, 0.3); /* Lighter border for contrast */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); /* Text shadow for readability */
+}
+
+.user-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.user-panel li {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #edebf2; /* Lighter text for contrast on wallpaper */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.user-panel li:hover {
+    background-color: rgba(255, 255, 255, 0.15); /* Subtle hover effect */
+}
+
+.user-panel li.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Group/Settings button styling */
+#createGroupBtn {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: var(--accent-color);
+    color: rgb(10, 11, 1);
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: var(--border-radius-pill);
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+#createGroupBtn:hover {
+    background-color: #03451e;
+}
+
+
+/* ==========================================================================
+   4. Chat Container & Messages (Transparent to show .main-chat background)
+   ========================================================================== */
+
+.chat-container {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make messages background transparent so the .main-chat wallpaper shows */
+.messages.container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: transparent; /* This is key */
+}
+
+.message {
+    max-width: 65%;
+    padding: 12px 18px;
+    margin: 8px 0;
+    border-radius: 20px;
+    clear: both;
+    position: relative;
+    font-size: 15px;
+    word-wrap: break-word;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Received Message (Left) */
+.left {
+    float: left;
+    background-color: var(--chat-bubble-other);
+    border-bottom-left-radius: 5px;
+}
+
+/* Sent Message (Right) */
+.right {
+    float: right;
+    background-color: var(--chat-bubble-self);
+    color: #333;
+    border-bottom-right-radius: 5px;
+}
+
+/* Notification/System Message */
+.center {
+    width: 100%;
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   5. Send Message Area
+   ========================================================================== */
+
+.send {
+    padding: 15px 20px;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+#send-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* Styling for the emojionearea input field (or plain textarea) */
+.emojionearea-editor, textarea#messageInp {
+    flex-grow: 1;
+    min-height: 40px !important;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius-pill);
+    padding: 10px 15px;
+    outline: none;
+    resize: none; 
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-pill);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+}
+
+.btn:hover {
+    background-color: #04471c;
+}
