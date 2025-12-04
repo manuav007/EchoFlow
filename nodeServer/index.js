@@ -112,6 +112,30 @@ io.on('connection', socket => {
         });
     });
 
+    // For Private File Sharing
+    socket.on('private-file', ({ to, fileName, fileType, fileData }) => {
+        const targetSocket = io.sockets.connected[to];
+        if (targetSocket) {
+            targetSocket.emit('receive-file', {
+                fromName: users[socket.id],
+                fileName,
+                fileType,
+                fileData
+            });
+        }
+    });
+
+    // For Group File Sharing
+    socket.on('group-file', ({ groupName, fileName, fileType, fileData }) => {
+        socket.to(groupName).emit('receive-group-file', {
+            fromName: users[socket.id],
+            groupName,
+            fileName,
+            fileType,
+            fileData
+        });
+    });
+
     // Handle user disconnect
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);

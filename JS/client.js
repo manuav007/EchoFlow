@@ -2,7 +2,9 @@ const socket = io('http://localhost:8000');
 
 const form = document.getElementById('send-container');
 const messageInput = document.getElementById('messageInp');
-const messageContainer = document.querySelector('.container')
+const messageContainer = document.querySelector('.container');
+const fileInput = document.getElementById('fileInput');
+const fileBtn = document.getElementById('fileBtn');
 
 var audio = new Audio('ting.mp3');
 
@@ -36,6 +38,22 @@ const append = (message, position, toUser = null)=>{
         chats[toUser].push({ message, position });
     }
 };
+
+// Function to display file/image in chat
+function appendFile(sender, fileName, fileType, fileData, position) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', position);
+
+    if (fileType.startsWith('image/')) {
+        messageElement.innerHTML = `<strong>${sender}:</strong><br><img src="${fileData}" style="max-width:200px; border-radius:10px;">`;
+    } else {
+        messageElement.innerHTML = `<strong>${sender}:</strong> <br>
+        <a href="${fileData}" download="${fileName}">📎 ${fileName} (Click to download)</a>`;
+    }
+
+    messageContainer.append(messageElement);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
 
 // Update users list
 const updateUsers = (usersData) => {
@@ -105,6 +123,44 @@ document.getElementById('createGroupBtn').onclick = () => {
     socket.emit('create-group', { groupName, members: selected });
 };
 
+// Open file dialog
+fileBtn.onclick = () => {
+    fileInput.click();
+};
+
+// Send file to server
+fileInput.onchange = () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        const fileData = reader.result; // base64 file
+
+        if (selectedUser) {
+            socket.emit('private-file', {
+                to: selectedUser,
+                fileName: file.name,
+                fileType: file.type,
+                fileData: fileData
+            });
+
+            appendFile(`You`, file.name, file.type, fileData, 'right');
+        } 
+        else if (selectedGroup) {
+            socket.emit('group-file', {
+                groupName: selectedGroup,
+                fileName: file.name,
+                fileType: file.type,
+                fileData: fileData
+            });
+
+            appendFile(`You (in ${selectedGroup})`, file.name, file.type, fileData, 'right');
+        }
+    };
+    reader.readAsDataURL(file); // Convert to Base64
+};
+
 form.addEventListener('submit', (e)=>{
     e.preventDefault();
     const message = messageInput.value.trim();
@@ -152,5 +208,16 @@ socket.on('receive-group', data => {
 
     if (selectedGroup === data.groupName) {
         append(`${data.fromName}: ${data.message}`, 'left');
+    }
+});
+
+// Receive files on client side
+socket.on('receive-file', data => {
+    appendFile(data.fromName, data.fileName, data.fileType, data.fileData, 'left');
+});
+
+socket.on('receive-group-file', data => {
+    if (selectedGroup === data.groupName) {
+        appendFile(data.fromName, data.fileName, data.fileType, data.fileData, 'left');
     }
 });

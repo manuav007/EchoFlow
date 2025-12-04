@@ -40,20 +40,33 @@
             </div>
             <div class="send">
                 <form action="#" id="send-container">
+                    <input type="file" id="fileInput" style="display:none;">
                     <input type="text" name="messageInp" id="messageInp">
-                    <script>
-                        $(document).ready(function () {
-                            $("#messageInp").emojioneArea({
-                                pickerPosition: "top",
-
-                            });
-                        })
-                    </script>
-                    <button class="btn" type="submit"><i class="fa fa-paper-plane-o" aria-hidden="true"></i> Send</button>
+                    
+                    <button class="btn" type="button" id="fileBtn">
+                        <i class="fa fa-paperclip" aria-hidden="true"></i>
+                    </button>
+                    
+                    <button class="btn" type="submit">
+                        <i class="fa fa-paper-plane-o" aria-hidden="true"></i> Send
+                    </button>
                 </form>
             </div>
         </div>
     </div>
+    
+    <script>
+        $(document).ready(function () {
+            $("#messageInp").emojioneArea({
+                pickerPosition: "top",
+            });
+            
+            // Add click handler for file button
+            $("#fileBtn").click(function() {
+                $("#fileInput").click();
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -274,4 +274,19 @@ h1 {
 
 .btn:hover {
     background-color: #04471c;
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> 46291958052c0d2164b6eda3dd5174bbfd7de86d
+.message img {
+    max-width: 200px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.message a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
 }
