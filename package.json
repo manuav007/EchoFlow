@@ -1,0 +1,23 @@
+{
+  "name": "realtime-chat-app-master",
+  "version": "1.0.0",
+  "description": "Docker Bridge Networking provides an isolated network environment where containers can communicate with each other using a virtual bridge. This setup allows containers to share a network but remain isolated from the host and other networks unless explicitly connected.",
+  "main": "frontend-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manuav007/EchoFlow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manuav007/EchoFlow/issues"
+  },
+  "homepage": "https://github.com/manuav007/EchoFlow#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
