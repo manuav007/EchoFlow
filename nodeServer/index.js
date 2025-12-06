@@ -1,8 +1,14 @@
 // index.js
-const io = require('socket.io')(8000, {
-    cors: {
-        origin: "*",
-    }
+const http = require('http');
+const server = http.createServer();
+const ioLib = require('socket.io');
+
+// allow CORS and create socket.io attached to the HTTP server
+const io = ioLib(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
 });
 
 const users = {};
@@ -34,8 +40,21 @@ function sanitizeText(text){
   return text.replace(bannedRegexServer, match => '*'.repeat(match.length));
 }
 
+// helper to get socket by id (works on various socket.io versions)
+function getSocketById(id) {
+  // v3+/v4:
+  if (io.sockets && io.sockets.sockets && typeof io.sockets.sockets.get === 'function') {
+    return io.sockets.sockets.get(id);
+  }
+  // v2:
+  if (io.sockets && io.sockets.connected) {
+    return io.sockets.connected[id];
+  }
+  return null;
+}
+
 // ----------------------
-// Existing code continues...
+// Updated code with Socket.IO v4+ fixes
 // ----------------------
 
 // When a user connects
@@ -55,10 +74,10 @@ io.on('connection', socket => {
         socket.broadcast.emit('receive', { message: message, name: users[socket.id] });
     });
 
-    // Handle private messaging (with sanitization)
+    // Handle private messaging (with sanitization) - UPDATED for Socket.IO v4+
     socket.on('private-message', ({ to, message }) => {
         const safeMessage = sanitizeText(message);
-        const targetSocket = io.sockets.connected[to];
+        const targetSocket = getSocketById(to); // ✅ UPDATED: Using helper function
         if (targetSocket) {
             targetSocket.emit('receive-private', { 
                 message: safeMessage, 
@@ -68,7 +87,7 @@ io.on('connection', socket => {
         }
     });
 
-    // Handle group creation
+    // Handle group creation - UPDATED for Socket.IO v4+
     socket.on('create-group', ({ groupName, members }) => {
         if (!groups[groupName]) groups[groupName] = [];
 
@@ -76,8 +95,8 @@ io.on('connection', socket => {
             if (!groups[groupName].includes(id)) {
                 groups[groupName].push(id);
 
-                // ✅ Fixed for Socket.IO v2.x
-                const memberSocket = io.sockets.connected[id];
+                // ✅ UPDATED: Using helper function
+                const memberSocket = getSocketById(id);
                 if (memberSocket) {
                     memberSocket.join(groupName);
                 }
@@ -88,7 +107,7 @@ io.on('connection', socket => {
 
         // Optional: Notify members
         members.forEach(id => {
-            const memberSocket = io.sockets.connected[id];
+            const memberSocket = getSocketById(id); // ✅ UPDATED
             if (memberSocket) {
                 memberSocket.emit('receive-group', {
                     message: `You have been added to group "${groupName}"`,
@@ -112,9 +131,9 @@ io.on('connection', socket => {
         });
     });
 
-    // For Private File Sharing
+    // For Private File Sharing - UPDATED for Socket.IO v4+
     socket.on('private-file', ({ to, fileName, fileType, fileData }) => {
-        const targetSocket = io.sockets.connected[to];
+        const targetSocket = getSocketById(to); // ✅ UPDATED: Using helper function
         if (targetSocket) {
             targetSocket.emit('receive-file', {
                 fromName: users[socket.id],
@@ -143,4 +162,10 @@ io.on('connection', socket => {
         delete users[socket.id];
         io.emit('user-list', users);
     });
+});
+
+// finally start server listening on 0.0.0.0
+const PORT = 8000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Socket server listening on http://0.0.0.0:${PORT}`);
 });

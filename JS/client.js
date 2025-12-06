@@ -1,4 +1,5 @@
-const socket = io('http://localhost:8000');
+// IMPORTANT: Updated for EC2
+const socket = io('http://51.20.8.185:8000');
 
 const form = document.getElementById('send-container');
 const messageInput = document.getElementById('messageInp');
@@ -61,13 +62,12 @@ const updateUsers = (usersData) => {
     const usersList = document.getElementById('users');
     usersList.innerHTML = '';
     Object.keys(usersData).forEach(id => {
-        if (id !== socket.id) {   // ✅ don't show yourself
+        if (id !== socket.id) {   // don't show yourself
             const li = document.createElement('li');
             li.innerText = usersData[id];
             li.onclick = () => {
                 selectedUser = id;
-                selectedGroup = null; // ✅ deselect group chat
-                // Show old chats with this user
+                selectedGroup = null; 
                 messageContainer.innerHTML = '';
                 if (chats[selectedUser]) {
                     chats[selectedUser].forEach(chat => {
@@ -89,7 +89,7 @@ const updateGroups = (groupsData) => {
         li.innerText = groupName;
         li.onclick = () => {
             selectedGroup = groupName;
-            selectedUser = null; // ✅ deselect private chat
+            selectedUser = null; 
             messageContainer.innerHTML = '';
             if (groups[groupName]) {
                 groups[groupName].forEach(chat => {
@@ -106,14 +106,13 @@ document.getElementById('createGroupBtn').onclick = () => {
     const groupName = prompt("Enter group name:");
     if (!groupName) return;
 
-    // Select users for the group
     const userIds = Object.keys(users).filter(id => id !== socket.id); 
     if (userIds.length === 0) {
         alert("No other users online to create a group");
         return;
     }
 
-    let selected = [socket.id]; // ✅ always include yourself first
+    let selected = [socket.id]; // always include yourself
 
     userIds.forEach(id => {
         const include = confirm(`Add ${users[id]} to the group?`);
@@ -135,7 +134,7 @@ fileInput.onchange = () => {
 
     const reader = new FileReader();
     reader.onload = () => {
-        const fileData = reader.result; // base64 file
+        const fileData = reader.result;
 
         if (selectedUser) {
             socket.emit('private-file', {
@@ -158,7 +157,7 @@ fileInput.onchange = () => {
             appendFile(`You (in ${selectedGroup})`, file.name, file.type, fileData, 'right');
         }
     };
-    reader.readAsDataURL(file); // Convert to Base64
+    reader.readAsDataURL(file);
 };
 
 form.addEventListener('submit', (e)=>{
@@ -167,19 +166,14 @@ form.addEventListener('submit', (e)=>{
     if (!message) return;
 
     if (selectedUser) {
-        // private chat
         append(`You: ${message}`, 'right', selectedUser);
         socket.emit('private-message', { message, to: selectedUser });
     } else if (selectedGroup) {
-        // group chat
-        // 1) append locally for sender view
         append(`You (in ${selectedGroup}): ${message}`, 'right');
 
-        // 2) store locally in groups so when you re-open the group you see history
         if (!groups[selectedGroup]) groups[selectedGroup] = [];
         groups[selectedGroup].push({ message: `You (in ${selectedGroup}): ${message}`, position: 'right' });
 
-        // 3) send to server (server will sanitize and broadcast to other members only)
         socket.emit('group-message', { message, groupName: selectedGroup });
     } else {
         return alert("Select a user or group to chat with");
@@ -193,7 +187,7 @@ socket.emit('new-user-joined', name);
 socket.on('user-list', users => updateUsers(users));
 
 socket.on('receive-private', data => {
-    append(`${data.fromName}: ${data.message}`, 'left', data.from);  // store with sender id
+    append(`${data.fromName}: ${data.message}`, 'left', data.from);
 });
 
 socket.on('user-left', name => {

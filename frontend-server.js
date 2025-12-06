@@ -8,6 +8,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.listen(3000, () => {
-  console.log("Frontend running on http://localhost:3000");
+// IMPORTANT: Allow external access on EC2
+app.listen(3000, "0.0.0.0", () => {
+  console.log("Frontend running on http://0.0.0.0:3000");
 });
