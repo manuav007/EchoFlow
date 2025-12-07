@@ -1,5 +1,5 @@
 // IMPORTANT: Updated for EC2
-const socket = io('http://51.20.8.185:8000');
+const socket = io('http://56.228.33.168:8000');
 
 const form = document.getElementById('send-container');
 const messageInput = document.getElementById('messageInp');
